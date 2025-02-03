@@ -4,7 +4,7 @@ using SQLite;  // Imports SQLite for database interactions
 namespace MauiToDo.Data
 {
     // Internal class responsible for handling database operations
-    internal class Database
+    public class Database
     {
         // Private field to hold the SQLite connection
         private readonly SQLiteAsyncConnection _connection;

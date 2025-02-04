@@ -19,7 +19,7 @@ namespace MauiToDo.Data
             var databasePath = Path.Combine(dataDir, "MauiTodo.db");
 
             // Retrieves the encryption key from secure storage (asynchronous call awaited synchronously)
-            string _dbEncryptionKey = SecureStorage.GetAsync("dbKey").Result;
+            string? _dbEncryptionKey = SecureStorage.GetAsync("dbKey").Result;
 
             // If no encryption key exists, generate a new GUID and store it securely
             if (string.IsNullOrEmpty(_dbEncryptionKey))

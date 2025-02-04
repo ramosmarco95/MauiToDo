@@ -35,13 +35,35 @@
                 HeightRequest="50"
                 HorizontalOptions="Center"
                 Clicked="Button_Clicked" />
-        <ScrollView Grid.Row="4">
-            
-            <Label HorizontalTextAlignment="Center"
-                   SemanticProperties.Description="The list of todo items in the database" 
-                    x:Name="TodosLabel" />
-            
-        </ScrollView>
+        
+        <CollectionView Grid.Row="4"
+                        x:Name="TodosCollection">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid WidthRequest="350"
+                          Padding="10"
+                          Margin="0,20"
+                          ColumnDefinitions="2*,5"
+                          RowDefinitions="Auto,50"
+                          x:Name="TodoItem">
+                        <CheckBox VerticalOptions="Center"
+                                  HorizontalOptions="Center"
+                                  Grid.Column="0"
+                                  Grid.Row="0" />
+                        <Label Text="{Binding Title}"
+                               FontAttributes="Bold"
+                               LineBreakMode="WordWrap"
+                               HorizontalOptions="StartAndExpand"
+                               FontSize="Large"
+                               Grid.Row="0"
+                               Grid.Column="1" />
+                        <Label Text="{Binding Due, StringFormat='{0:dd MMM YYYY}'}"
+                               Grid.Column="1"
+                               Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
 
     </Grid>

@@ -1,30 +1,30 @@
 ﻿using MauiToDo.Data;
 using MauiToDo.Models;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace MauiToDo
 {
     public partial class MainPage : ContentPage
     {
         public ObservableCollection<TodoItem> Todos { get; set; } = new();
-         
-        //string _todoListData = string.Empty;
-        readonly Database _database;
+        private readonly Database _database;
+
+        public ICommand DeleteItemCommand { get; }
+
         public MainPage()
         {
             InitializeComponent();
             _database = new Database();
+            DeleteItemCommand = new Command<TodoItem>(async (item) => await DeleteTodoItem(item));
             _ = Initialize();
-            TodosCollection.ItemsSource = Todos;
         }
 
         private async Task Initialize()
         {
             var todos = await _database.GetTodos();
             foreach (var todo in todos)
-                Todos.Add(todo); // Add to ObservableCollection
-                //_todoListData += $"Title: {todo.Title}\tDue Date: {todo.Due:f} {Environment.NewLine}";
-            //TodosLabel.Text = _todoListData;
+                Todos.Add(todo);
         }
 
         private async void Button_Clicked(object sender, EventArgs e)
@@ -37,13 +37,30 @@ namespace MauiToDo
             var inserted = await _database.AddTodo(todo);
             if (inserted != 0)
             {
-                Todos.Add(todo); //add new item to ObservableCollection
-                //_todoListData += $"{todo.Title} - {todo.Due:f} {Environment.NewLine}";
-                //TodosLabel.Text = _todoListData;
+                Todos.Add(todo);
                 TodoTitleEntry.Text = string.Empty;
                 DueDatePicker.Date = DateTime.Now;
             }
         }
-    }
 
+        private async void DeleteButton_Clicked(object sender, EventArgs e)
+        {
+            if (TodosCollection.SelectedItem is TodoItem selectedTodo)
+            {
+                await DeleteTodoItem(selectedTodo);
+            }
+        }
+
+        private async Task DeleteTodoItem(TodoItem item)
+        {
+            if (item != null)
+            {
+                var deleted = await _database.DeleteTodo(item);
+                if (deleted != 0)
+                {
+                    Todos.Remove(item);
+                }
+            }
+        }
+    }
 }

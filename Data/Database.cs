@@ -1,79 +1,109 @@
-﻿using MauiToDo.Models;  // Imports the models used in the application
-using SQLite;  // Imports SQLite for database interactions
+﻿using MauiToDo.Models;
+using SQLite;
+using System.Threading.Tasks;
 
 namespace MauiToDo.Data
 {
-    // Internal class responsible for handling database operations
     public class Database
     {
-        // Private field to hold the SQLite connection
         private readonly SQLiteAsyncConnection _connection;
 
-        // Constructor initializes the database connection
         public Database()
         {
-            // Gets the application's data directory path
             var dataDir = FileSystem.AppDataDirectory;
-
-            // Constructs the database file path
             var databasePath = Path.Combine(dataDir, "MauiTodo.db");
 
-            // Retrieves the encryption key from secure storage (asynchronous call awaited synchronously)
             string? _dbEncryptionKey = SecureStorage.GetAsync("dbKey").Result;
-
-            // If no encryption key exists, generate a new GUID and store it securely
             if (string.IsNullOrEmpty(_dbEncryptionKey))
             {
-                Guid g = new Guid();  // Creates a new GUID
-                _dbEncryptionKey = g.ToString();  // Converts GUID to string
-                SecureStorage.SetAsync("dbKey", _dbEncryptionKey);  // Stores encryption key securely
+                _dbEncryptionKey = Guid.NewGuid().ToString();
+                SecureStorage.SetAsync("dbKey", _dbEncryptionKey);
             }
 
-            // Creates database connection options with encryption enabled
             var dbOptions = new SQLiteConnectionString(databasePath, true, key: _dbEncryptionKey);
 
-            // Initializes the SQLite connection asynchronously
+            // ✅ Assign within the constructor
             _connection = new SQLiteAsyncConnection(dbOptions);
 
-            // Calls the Initialise method asynchronously to create necessary tables
-            _ = Initialise();
+            _ = Initialise(); // Initialize DB
         }
 
-        // Initializes the database by creating necessary tables
+
         private async Task Initialise()
         {
-            await _connection.CreateTableAsync<TodoItem>();  // Creates the TodoItem table if it doesn't exist
+            try
+            {
+                await _connection.CreateTableAsync<TodoItem>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database initialization failed: {ex.Message}");
+            }
         }
 
-        // Retrieves all Todo items from the database
         public async Task<List<TodoItem>> GetTodos()
         {
-            return await _connection.Table<TodoItem>().ToListAsync();  // Fetches all records as a list
+            try
+            {
+                return await _connection.Table<TodoItem>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving todos: {ex.Message}");
+                return new List<TodoItem>();
+            }
         }
 
-        // Retrieves a specific Todo item by ID
-        public async Task<TodoItem> GetTodo(int id)
+        public async Task<TodoItem?> GetTodo(int id)
         {
-            var query = _connection.Table<TodoItem>().Where(t => t.Id == id);  // Queries for a specific ID
-            return await query.FirstOrDefaultAsync();  // Returns the first matching record or null if not found
+            try
+            {
+                return await _connection.Table<TodoItem>().Where(t => t.Id == id).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving todo with ID {id}: {ex.Message}");
+                return null;
+            }
         }
 
-        // Adds a new Todo item to the database
         public async Task<int> AddTodo(TodoItem item)
         {
-            return await _connection.InsertAsync(item);  // Inserts the item and returns the number of rows affected
+            try
+            {
+                return await _connection.InsertAsync(item);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding todo: {ex.Message}");
+                return 0;
+            }
         }
 
-        // Deletes a Todo item from the database
         public async Task<int> DeleteTodo(TodoItem item)
         {
-            return await _connection.DeleteAsync(item);  // Deletes the item and returns the number of rows affected
+            try
+            {
+                return await _connection.DeleteAsync(item);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting todo: {ex.Message}");
+                return 0;
+            }
         }
 
-        // Updates an existing Todo item in the database
         public async Task<int> UpdateTodo(TodoItem item)
         {
-            return await _connection.UpdateAsync(item);  // Updates the item and returns the number of rows affected
+            try
+            {
+                return await _connection.UpdateAsync(item);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating todo: {ex.Message}");
+                return 0;
+            }
         }
     }
 }

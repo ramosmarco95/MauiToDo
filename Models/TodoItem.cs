@@ -1,9 +1,5 @@
 ﻿using SQLite;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MauiToDo.Models
 {
@@ -11,8 +7,11 @@ namespace MauiToDo.Models
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        public string? Title { get; set; }
-        public DateTime Due { get; set; }
+
+        public string Title { get; set; } = string.Empty; // Ensures a default non-null value
+
+        public DateTime Due { get; set; } = DateTime.UtcNow; // Default to current date
+
         public bool Done { get; set; } = false;
     }
 }

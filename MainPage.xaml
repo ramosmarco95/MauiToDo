@@ -62,7 +62,7 @@
                            Grid.Column="1"
                            Grid.Row="1" />
 
-                            <!-- Red "X" button for deletion -->
+                           
                             <Button Text="X"
                             BackgroundColor="Red"
                             TextColor="White"

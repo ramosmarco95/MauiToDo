@@ -22,7 +22,7 @@ namespace MauiToDo.Data
 
             var dbOptions = new SQLiteConnectionString(databasePath, true, key: _dbEncryptionKey);
 
-            // ✅ Assign within the constructor
+            
             _connection = new SQLiteAsyncConnection(dbOptions);
 
             _ = Initialise(); // Initialize DB
